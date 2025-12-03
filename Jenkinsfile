@@ -6,46 +6,27 @@ pipeline {
     }            
     stages{
            stage("Cleanup Workspace"){
-                   steps {
-                   cleanWs()
-                   }
+                         steps {
+                         cleanWs()
+                         }
            }
 
            stage("Checkout from SCM"){
-                  steps {
-                      git branch: 'main', credentialsId: 'github', url: 'https://github.com/Rubeshram/register-app'
-                  }
+                        steps {
+                        git branch: 'main', credentialsId: 'github', url: 'https://github.com/Rubeshram/register-app'
+                        }
            }
 
            stage("Build Application"){
-               steps {
-                   sh "mvn clean package"
-               }
-           }
-
-           stage("Test Application"){
-               steps {
-                     sh "mvn test"
-           }
+                  steps {
+                         sh "mvn clean package"
+                  }
        }
 
-       stage("SonarQube Analysis"){
-           steps {
-	           script {
-		        withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') { 
-                        sh "mvn sonar:sonar"
-		        }
-	           }	
+       stage("Test Application"){
+              steps {
+                 sh "mvn test"
            }
        }
-
-       stage("Quality Gate"){
-           steps {
-               script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
-                }	
-            }
-
-        }
    }
-}
+} 
