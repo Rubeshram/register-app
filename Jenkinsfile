@@ -13,15 +13,15 @@ pipeline {
 
            stage("Checkout from SCM"){
                         steps {
-                            git branch: 'main', credentialsId: 'github', url: 'https://github.com/Rubeshram/register-app'
+                        git branch: 'main', credentialsId: 'github', url: 'https://github.com/Rubeshram/register-app'
                         }
            }
 
            stage("Build Application"){
                   steps {
-                      sh "mvn clean package"
+                         sh "mvn clean package"
                   }
-               
+			   
        }
 
        stage("Test Application"){
@@ -29,16 +29,24 @@ pipeline {
                  sh "mvn test"
            }
        }
-        
+		
        stage("SonarQube Analysis"){
            steps {
 	       script {
-	             withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') { 
-                 sh "mvn sonar:sonar"
+	               withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') { 
+                          sh "mvn sonar:sonar"
 		      }
-            }
-	    }
-           
+             }
+	       }
+          }	
+      
+          stage("Quality Gate"){
+              steps {
+                  script {
+                       waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
+                    }	
+                }
+
+        }
     }
-   }
- }  
+}	
